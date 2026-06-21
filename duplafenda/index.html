@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dupla fenda — Igor.AzF</title>
+<meta name="description" content="Arquivo de projetos de Igor.AzF: repositório científico, textos, anotações, imagens e vídeos.">
+
+<!-- Fontes: Share Tech Mono (títulos, estilo terminal) e IBM Plex Mono (corpo) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DUPLA FENDA — estilo Matrix
+   Para mudar cores, edite apenas as variáveis abaixo.
+   ============================================================ */
+:root{
+  --fundo:       #000000;   /* fundo preto */
+  --verde:       #00FF41;   /* verde fosforescente principal */
+  --verde-medio: #00B32E;   /* verde para texto secundário */
+  --verde-fosco: #0A3D14;   /* divisórias e molduras */
+  --verde-brilho:rgba(0,255,65,0.45); /* brilho dos títulos */
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--fundo);
+  color:var(--verde);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:16px;
+  line-height:1.7;
+}
+
+/* Scanlines sutis de monitor CRT sobre a página toda */
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px
+  );
+  z-index:99;
+}
+
+a{ color:var(--verde); text-decoration:underline; text-decoration-color:var(--verde-fosco); }
+a:hover{ text-decoration-color:var(--verde); text-shadow:0 0 8px var(--verde-brilho); }
+a:focus-visible, button:focus-visible{
+  outline:1px solid var(--verde);
+  outline-offset:3px;
+}
+
+::selection{ background:var(--verde); color:#000; }
+
+.miolo{ max-width:760px; margin:0 auto; padding:0 24px; }
+
+/* ---------- Cabeçalho ---------- */
+header{
+  border-bottom:1px solid var(--verde-fosco);
+  padding:60px 0 0;
+}
+.titulo{
+  font-family:'Share Tech Mono', monospace;
+  font-weight:400;
+  font-size:clamp(2.2rem, 7vw, 3.4rem);
+  letter-spacing:0.04em;
+  text-shadow:0 0 12px var(--verde-brilho);
+}
+.titulo::after{
+  content:"_";
+  animation:cursor 1s steps(1) infinite;
+}
+@keyframes cursor{ 50%{ opacity:0; } }
+@media (prefers-reduced-motion: reduce){
+  .titulo::after{ animation:none; }
+}
+.subtitulo{
+  color:var(--verde-medio);
+  font-size:0.8rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-top:10px;
+}
+
+/* Franjas de interferência (a dupla fenda projetada no anteparo) */
+.franjas{
+  height:34px;
+  margin-top:34px;
+  background:repeating-linear-gradient(
+    90deg,
+    var(--verde) 0 6px,
+    transparent 6px 22px
+  );
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%, #000 50%, #000 82%, transparent);
+          mask-image:linear-gradient(90deg, transparent, #000 18%, #000 50%, #000 82%, transparent);
+  opacity:0.55;
+  filter:drop-shadow(0 0 6px var(--verde-brilho));
+}
+
+/* ---------- Abas ---------- */
+nav{
+  position:sticky; top:0;
+  background:var(--fundo);
+  border-bottom:1px solid var(--verde-fosco);
+  z-index:10;
+}
+.abas{
+  display:flex;
+  gap:4px;
+  overflow-x:auto;
+}
+.abas button{
+  appearance:none;
+  background:none;
+  border:none;
+  border-bottom:2px solid transparent;
+  cursor:pointer;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:0.8rem;
+  letter-spacing:0.06em;
+  color:var(--verde-medio);
+  padding:14px 14px 12px;
+  white-space:nowrap;
+}
+.abas button::before{ content:"> "; opacity:0; }
+.abas button:hover{ color:var(--verde); }
+.abas button[aria-selected="true"]{
+  color:var(--verde);
+  border-bottom-color:var(--verde);
+  text-shadow:0 0 8px var(--verde-brilho);
+}
+.abas button[aria-selected="true"]::before{ opacity:1; }
+
+/* ---------- Seções ---------- */
+main{ padding:48px 0 80px; }
+section[hidden]{ display:none; }
+.secao-titulo{
+  font-family:'Share Tech Mono', monospace;
+  font-weight:400;
+  font-size:1.4rem;
+  letter-spacing:0.05em;
+  margin-bottom:28px;
+  text-shadow:0 0 10px var(--verde-brilho);
+}
+.secao-titulo::before{ content:"// "; color:var(--verde-medio); }
+
+/* Item de lista (repositório, textos) */
+.item{
+  border-top:1px solid var(--verde-fosco);
+  padding:22px 0;
+}
+.item:last-of-type{ border-bottom:1px solid var(--verde-fosco); }
+.item .data{
+  font-size:0.72rem;
+  color:var(--verde-medio);
+  letter-spacing:0.1em;
+  display:block;
+  margin-bottom:6px;
+}
+.item .data::before{ content:"["; }
+.item .data::after{ content:"]"; }
+.item h3{
+  font-family:'Share Tech Mono', monospace;
+  font-weight:400;
+  font-size:1.1rem;
+  line-height:1.4;
+}
+.item p{ color:var(--verde-medio); font-size:0.9rem; margin-top:6px; }
+.item .ref{
+  font-size:0.74rem;
+  color:var(--verde-medio);
+  margin-top:8px;
+  display:block;
+}
+
+/* Grade de imagens */
+.grade-imagens{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+  gap:14px;
+}
+.grade-imagens figure img{
+  width:100%;
+  display:block;
+  border:1px solid var(--verde-fosco);
+}
+.grade-imagens figure:hover img{
+  border-color:var(--verde);
+  box-shadow:0 0 12px var(--verde-brilho);
+}
+.grade-imagens figcaption{
+  font-size:0.7rem;
+  color:var(--verde-medio);
+  margin-top:6px;
+}
+
+/* Grade de vídeos */
+.grade-videos{ display:grid; gap:28px; }
+.video .moldura{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  border:1px solid var(--verde-fosco);
+}
+.video iframe{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  border:0;
+}
+.video figcaption{
+  font-size:0.76rem;
+  color:var(--verde-medio);
+  margin-top:8px;
+}
+
+/* ---------- Rodapé ---------- */
+footer{
+  border-top:1px solid var(--verde-fosco);
+  padding:28px 0 48px;
+  color:var(--verde-medio);
+  font-size:0.74rem;
+  letter-spacing:0.06em;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="miolo">
+    <h1 class="titulo">dupla fenda</h1>
+    <p class="subtitulo">arquivo de projetos · Igor.AzF</p>
+  </div>
+  <div class="franjas" aria-hidden="true"></div>
+</header>
+
+<nav aria-label="Seções do arquivo">
+  <div class="miolo abas" role="tablist">
+    <button role="tab" aria-selected="true"  aria-controls="repositorio" id="tab-repositorio">repositório científico</button>
+    <button role="tab" aria-selected="false" aria-controls="textos"      id="tab-textos">textos &amp; anotações</button>
+    <button role="tab" aria-selected="false" aria-controls="imagens"     id="tab-imagens">imagens</button>
+    <button role="tab" aria-selected="false" aria-controls="videos"      id="tab-videos">vídeos</button>
+  </div>
+</nav>
+
+<main class="miolo">
+
+  <!-- ================= ABA: REPOSITÓRIO CIENTÍFICO ================= -->
+  <section id="repositorio" role="tabpanel" aria-labelledby="tab-repositorio">
+    <h2 class="secao-titulo">Repositório científico</h2>
+
+    <!-- MODELO DE ARTIGO — copie e cole este bloco para adicionar um novo.
+         Coloque os mais recentes no topo. -->
+    <article class="item">
+      <span class="data">2026</span>
+      <h3><a href="https://doi.org/XX.XXXX/exemplo">Título do artigo aqui</a></h3>
+      <p>Resumo curto em uma ou duas frases, se quiser.</p>
+      <span class="ref">Nome da Revista · DOI ou link para o PDF</span>
+    </article>
+
+    <article class="item">
+      <span class="data">2025</span>
+      <h3><a href="#">Outro artigo de exemplo</a></h3>
+      <span class="ref">Coautores, Revista, vol. 12</span>
+    </article>
+
+  </section>
+
+  <!-- ================= ABA: TEXTOS & ANOTAÇÕES ================= -->
+  <section id="textos" role="tabpanel" aria-labelledby="tab-textos" hidden>
+    <h2 class="secao-titulo">Textos, diários e anotações</h2>
+
+    <!-- MODELO DE TEXTO — copie e cole este bloco para adicionar um novo.
+         O texto pode ficar inteiro aqui dentro ou linkar para um arquivo
+         .html / .pdf que você suba junto na mesma pasta. -->
+    <article class="item">
+      <span class="data">11 jun 2026</span>
+      <h3>Título da anotação ou entrada de diário</h3>
+      <p>O texto pode ir direto aqui. Parágrafos curtos funcionam bem
+      neste formato de lista.</p>
+    </article>
+
+    <article class="item">
+      <span class="data">02 mai 2026</span>
+      <h3><a href="textos/exemplo.pdf">Texto mais longo (abre em PDF)</a></h3>
+      <p>Para textos longos, suba o arquivo numa pasta <code>textos/</code> e linke aqui.</p>
+    </article>
+
+  </section>
+
+  <!-- ================= ABA: IMAGENS ================= -->
+  <section id="imagens" role="tabpanel" aria-labelledby="tab-imagens" hidden>
+    <h2 class="secao-titulo">Imagens</h2>
+
+    <div class="grade-imagens">
+      <!-- MODELO DE IMAGEM — suba seus arquivos numa pasta "imagens/"
+           ao lado deste index.html e copie este bloco para cada foto. -->
+      <figure>
+        <img src="imagens/exemplo-1.jpg" alt="Descreva a imagem aqui" loading="lazy">
+        <figcaption>legenda da imagem · 2026</figcaption>
+      </figure>
+
+      <figure>
+        <img src="imagens/exemplo-2.jpg" alt="Descreva a imagem aqui" loading="lazy">
+        <figcaption>outra legenda · 2025</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= ABA: VÍDEOS ================= -->
+  <section id="videos" role="tabpanel" aria-labelledby="tab-videos" hidden>
+    <h2 class="secao-titulo">Vídeos</h2>
+
+    <div class="grade-videos">
+      <!-- MODELO DE VÍDEO — para YouTube, use o link de "incorporar":
+           https://www.youtube.com/embed/CODIGO_DO_VIDEO
+           Para Vimeo: https://player.vimeo.com/video/CODIGO -->
+      <figure class="video">
+        <div class="moldura">
+          <iframe src="https://www.youtube.com/embed/SUBSTITUA_AQUI"
+                  title="Título do vídeo"
+                  allow="accelerometer; encrypted-media; picture-in-picture"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+        <figcaption>título do vídeo · 2026</figcaption>
+      </figure>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="miolo">
+    duplafenda.com · Igor.AzF · contato: <a href="mailto:igor@duplafenda.com">igor@duplafenda.com</a>
+  </div>
+</footer>
+
+<script>
+/* Troca de abas — sem bibliotecas externas.
+   Guarda a aba na URL (#textos, #imagens...) para poder
+   compartilhar o link direto de uma seção. */
+const abas = document.querySelectorAll('[role="tab"]');
+const paineis = document.querySelectorAll('[role="tabpanel"]');
+
+function abrir(id){
+  paineis.forEach(p => p.hidden = (p.id !== id));
+  abas.forEach(t => t.setAttribute('aria-selected', t.getAttribute('aria-controls') === id));
+  history.replaceState(null, '', '#' + id);
+}
+
+abas.forEach(t => t.addEventListener('click', () => abrir(t.getAttribute('aria-controls'))));
+
+/* Abre a aba indicada na URL ao carregar a página */
+const inicial = location.hash.replace('#','');
+if (document.getElementById(inicial)) abrir(inicial);
+</script>
+
+</body>
+</html>
