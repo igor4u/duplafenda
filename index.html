@@ -217,6 +217,73 @@ section[hidden]{ display:none; }
   margin-top:8px;
 }
 
+/* ---------- Player de música (barra de destaque no topo) ---------- */
+#player{
+  position:sticky;
+  top:0;
+  left:0; right:0;
+  background:var(--fundo);
+  border-bottom:1px solid var(--verde-fosco);
+  z-index:60;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 24px;
+  font-size:0.74rem;
+  letter-spacing:0.05em;
+  box-shadow:0 0 18px rgba(0,255,65,0.12);
+}
+#player button{
+  appearance:none;
+  background:none;
+  border:1px solid var(--verde-fosco);
+  color:var(--verde);
+  cursor:pointer;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:0.85rem;
+  padding:5px 11px;
+  line-height:1;
+  flex:none;
+}
+#player button:hover{
+  border-color:var(--verde);
+  box-shadow:0 0 8px var(--verde-brilho);
+}
+#player .faixa{
+  color:var(--verde-medio);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:90px;
+  max-width:240px;
+}
+#player .faixa b{ color:var(--verde); font-weight:400; }
+/* Barra de progresso clicável */
+#player .progresso{
+  flex:1;
+  height:8px;
+  background:var(--verde-fosco);
+  cursor:pointer;
+  position:relative;
+  min-width:60px;
+}
+#player .progresso .preenchido{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:0%;
+  background:var(--verde);
+  box-shadow:0 0 8px var(--verde-brilho);
+}
+#player .tempo{
+  color:var(--verde-medio);
+  flex:none;
+  font-size:0.7rem;
+  white-space:nowrap;
+}
+
+/* A navegação de abas fica logo abaixo do player */
+nav{ top:0; }
+
 /* ---------- Rodapé ---------- */
 footer{
   border-top:1px solid var(--verde-fosco);
@@ -228,6 +295,17 @@ footer{
 </style>
 </head>
 <body>
+
+<!-- ================= PLAYER DE MÚSICA ================= -->
+<div id="player">
+  <button id="btn-prev" aria-label="Faixa anterior">⏮</button>
+  <button id="btn-play" aria-label="Tocar ou pausar">▶</button>
+  <button id="btn-next" aria-label="Próxima faixa">⏭</button>
+  <span class="faixa"><b id="faixa-atual">—</b></span>
+  <div class="progresso" id="progresso"><div class="preenchido" id="preenchido"></div></div>
+  <span class="tempo" id="tempo">0:00 / 0:00</span>
+  <audio id="audio"></audio>
+</div>
 
 <header>
   <div class="miolo">
@@ -356,6 +434,107 @@ abas.forEach(t => t.addEventListener('click', () => abrir(t.getAttribute('aria-c
 /* Abre a aba indicada na URL ao carregar a página */
 const inicial = location.hash.replace('#','');
 if (document.getElementById(inicial)) abrir(inicial);
+
+/* ============================================================
+   PLAYER DE MÚSICA
+   ------------------------------------------------------------
+   PARA ADICIONAR MÚSICAS:
+   1. Crie uma pasta "musica" ao lado deste index.html
+   2. Coloque seus arquivos .mp3 dentro dela
+   3. Liste o nome de cada arquivo na lista abaixo, entre aspas,
+      separados por vírgula. Exemplo:
+        const PLAYLIST = [
+          "primeira-faixa.mp3",
+          "segunda-faixa.mp3",
+          "outra musica.mp3"
+        ];
+   Os arquivos tocam em sequência e repetem para sempre.
+   ============================================================ */
+const PLAYLIST = [
+  "exemplo-1.mp3",
+  "exemplo-2.mp3"
+];
+
+const audio   = document.getElementById('audio');
+const btnPrev = document.getElementById('btn-prev');
+const btnPlay = document.getElementById('btn-play');
+const btnNext = document.getElementById('btn-next');
+const rotulo  = document.getElementById('faixa-atual');
+const progresso  = document.getElementById('progresso');
+const preenchido = document.getElementById('preenchido');
+const tempoEl    = document.getElementById('tempo');
+
+let indice = 0;
+
+function nomeLimpo(arquivo){
+  // remove a extensão e troca traços/underscores por espaços
+  return arquivo.replace(/\.mp3$/i, '').replace(/[-_]/g, ' ');
+}
+
+function formataTempo(seg){
+  if (isNaN(seg)) return '0:00';
+  const m = Math.floor(seg / 60);
+  const s = Math.floor(seg % 60).toString().padStart(2, '0');
+  return m + ':' + s;
+}
+
+function carregar(i){
+  if (PLAYLIST.length === 0) return;
+  indice = (i + PLAYLIST.length) % PLAYLIST.length; // dá a volta na lista
+  audio.src = 'musica/' + PLAYLIST[indice];
+  rotulo.textContent = nomeLimpo(PLAYLIST[indice]);
+}
+
+function tocar(){
+  audio.play().then(() => {
+    btnPlay.textContent = '⏸';
+  }).catch(() => {
+    // navegador bloqueou o autoplay; espera um clique do usuário
+    btnPlay.textContent = '▶';
+  });
+}
+
+/* Atualiza a barra de progresso e o tempo enquanto toca */
+audio.addEventListener('timeupdate', () => {
+  const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  preenchido.style.width = pct + '%';
+  tempoEl.textContent = formataTempo(audio.currentTime) + ' / ' + formataTempo(audio.duration);
+});
+
+/* Clicar na barra pula para aquele ponto da música */
+progresso.addEventListener('click', (e) => {
+  if (!audio.duration) return;
+  const r = progresso.getBoundingClientRect();
+  audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+});
+
+/* Quando uma faixa termina, vai para a próxima (e repete no fim) */
+audio.addEventListener('ended', () => { carregar(indice + 1); tocar(); });
+
+btnPlay.addEventListener('click', () => {
+  if (audio.paused){ tocar(); } else { audio.pause(); btnPlay.textContent = '▶'; }
+});
+btnNext.addEventListener('click', () => { carregar(indice + 1); tocar(); });
+btnPrev.addEventListener('click', () => {
+  // se já passou de 3s, volta ao início da faixa; senão, faixa anterior
+  if (audio.currentTime > 3){ audio.currentTime = 0; }
+  else { carregar(indice - 1); tocar(); }
+});
+
+/* Tenta iniciar automaticamente ao carregar a página */
+if (PLAYLIST.length > 0){
+  carregar(0);
+  tocar();
+  /* Se o navegador bloquear o autoplay, começa no primeiro clique/toque
+     em qualquer lugar da página */
+  function destravar(){
+    if (audio.paused){ tocar(); }
+    window.removeEventListener('click', destravar);
+    window.removeEventListener('keydown', destravar);
+  }
+  window.addEventListener('click', destravar);
+  window.addEventListener('keydown', destravar);
+}
 </script>
 
 </body>
