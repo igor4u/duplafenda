@@ -438,21 +438,27 @@ if (document.getElementById(inicial)) abrir(inicial);
 /* ============================================================
    PLAYER DE MÚSICA
    ------------------------------------------------------------
-   PARA ADICIONAR MÚSICAS:
-   1. Crie uma pasta "musica" ao lado deste index.html
-   2. Coloque seus arquivos .mp3 dentro dela
-   3. Liste o nome de cada arquivo na lista abaixo, entre aspas,
-      separados por vírgula. Exemplo:
+   PARA ADICIONAR MÚSICAS — duas formas, que podem ser misturadas:
+
+   A) ARQUIVO LOCAL (para arquivos pequenos, até ~25 MB):
+      1. Crie uma pasta "musica" ao lado deste index.html
+      2. Coloque seus .mp3 dentro dela
+      3. Liste só o nome do arquivo, ex: "minha-faixa.mp3"
+
+   B) LINK EXTERNO (para arquivos grandes, ex: Internet Archive):
+      Cole o link direto do arquivo (começando com https://), ex:
+      "https://archive.org/download/ITEM/arquivo.webm"
+
+   Exemplo combinando as duas:
         const PLAYLIST = [
-          "primeira-faixa.mp3",
-          "segunda-faixa.mp3",
-          "outra musica.mp3"
+          "https://archive.org/download/meu-item/longa.webm",
+          "faixa-curta.mp3"
         ];
    Os arquivos tocam em sequência e repetem para sempre.
+   Formatos aceitos: mp3, webm, ogg, wav, m4a.
    ============================================================ */
 const PLAYLIST = [
-  "exemplo-1.mp3",
-  "exemplo-2.mp3"
+  "https://archive.org/download/sorrowful-orthodox-chants/Sorrowful_Orthodox_Chants.webm"
 ];
 
 const audio   = document.getElementById('audio');
@@ -467,8 +473,10 @@ const tempoEl    = document.getElementById('tempo');
 let indice = 0;
 
 function nomeLimpo(arquivo){
-  // remove a extensão e troca traços/underscores por espaços
-  return arquivo.replace(/\.mp3$/i, '').replace(/[-_]/g, ' ');
+  // pega só o nome do arquivo (depois da última barra), remove a extensão
+  // e troca traços/underscores por espaços
+  const base = arquivo.split('/').pop();
+  return base.replace(/\.(mp3|webm|ogg|wav|m4a)$/i, '').replace(/[-_]/g, ' ');
 }
 
 function formataTempo(seg){
@@ -481,8 +489,10 @@ function formataTempo(seg){
 function carregar(i){
   if (PLAYLIST.length === 0) return;
   indice = (i + PLAYLIST.length) % PLAYLIST.length; // dá a volta na lista
-  audio.src = 'musica/' + PLAYLIST[indice];
-  rotulo.textContent = nomeLimpo(PLAYLIST[indice]);
+  const faixa = PLAYLIST[indice];
+  // link completo (http...) toca direto; senão, busca na pasta musica
+  audio.src = /^https?:\/\//i.test(faixa) ? faixa : 'musica/' + faixa;
+  rotulo.textContent = nomeLimpo(faixa);
 }
 
 function tocar(){
