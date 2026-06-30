@@ -206,10 +206,12 @@ section[hidden]{ display:none; }
   aspect-ratio:16/9;
   border:1px solid var(--verde-fosco);
 }
-.video iframe{
+.video iframe,
+.video video{
   position:absolute; inset:0;
   width:100%; height:100%;
   border:0;
+  background:#000;
 }
 .video figcaption{
   font-size:0.76rem;
@@ -391,21 +393,9 @@ footer{
   <!-- ================= ABA: VÍDEOS ================= -->
   <section id="videos" role="tabpanel" aria-labelledby="tab-videos" hidden>
     <h2 class="secao-titulo">Vídeos</h2>
-
-    <div class="grade-videos">
-      <!-- MODELO DE VÍDEO — para YouTube, use o link de "incorporar":
-           https://www.youtube.com/embed/CODIGO_DO_VIDEO
-           Para Vimeo: https://player.vimeo.com/video/CODIGO -->
-      <figure class="video">
-        <div class="moldura">
-          <iframe src="https://www.youtube.com/embed/SUBSTITUA_AQUI"
-                  title="Título do vídeo"
-                  allow="accelerometer; encrypted-media; picture-in-picture"
-                  allowfullscreen loading="lazy"></iframe>
-        </div>
-        <figcaption>título do vídeo · 2026</figcaption>
-      </figure>
-    </div>
+    <!-- A grade é preenchida automaticamente pela lista VIDEOS no script.
+         Para adicionar vídeos, edite essa lista no fim do arquivo. -->
+    <div class="grade-videos" id="grade-videos"></div>
   </section>
 
 </main>
@@ -459,7 +449,7 @@ if (document.getElementById(inicial)) abrir(inicial);
    ============================================================ */
 const PLAYLIST = [
   "https://archive.org/download/sorrowful-orthodox-chants/Sorrowful_Orthodox_Chants.webm",
-   "https://archive.org/download/the-meditative-grace-of-nuns-singing-gregorian-chants-dxx-fad-ao-mq/The%20Meditative%20Grace%20of%20Nuns%20Singing%20Gregorian%20Chants%20%5BDxx_fadAoMQ%5D.mp3"
+  "https://archive.org/download/the-meditative-grace-of-nuns-singing-gregorian-chants-dxx-fad-ao-mq/The%20Meditative%20Grace%20of%20Nuns%20Singing%20Gregorian%20Chants%20%5BDxx_fadAoMQ%5D.mp3"
 ];
 
 const audio   = document.getElementById('audio');
@@ -546,6 +536,49 @@ if (PLAYLIST.length > 0){
   window.addEventListener('click', destravar);
   window.addEventListener('keydown', destravar);
 }
+
+/* ============================================================
+   VÍDEOS (aba "vídeos")
+   ------------------------------------------------------------
+   PARA ADICIONAR UM VÍDEO:
+   1. Suba o vídeo no Internet Archive (archive.org/upload)
+   2. Na página do item, seção DOWNLOAD OPTIONS, clique com o botão
+      direito no arquivo de vídeo (ex: "MPEG4" ou ".mp4") e copie o link
+   3. Adicione um item na lista abaixo com o link e um título:
+        { src: "https://archive.org/download/ITEM/arquivo.mp4",
+          titulo: "Meu vídeo · 2026" }
+   Os vídeos aparecem na grade com player nativo (play, volume, tela cheia).
+   Os mais recentes ficam no topo da lista.
+   Formatos aceitos: mp4, webm, ogg.
+   ============================================================ */
+const VIDEOS = [
+  // { src: "https://archive.org/download/0204_20260630/0204.mov",
+  //   titulo: "Voando em águas calmas · 10/2025" }
+];
+
+const gradeVideos = document.getElementById('grade-videos');
+
+function montarVideos(){
+  if (!gradeVideos) return;
+  if (VIDEOS.length === 0){
+    gradeVideos.innerHTML =
+      '<p style="color:var(--verde-medio);font-size:0.85rem">Nenhum vídeo ainda.</p>';
+    return;
+  }
+  gradeVideos.innerHTML = VIDEOS.map(v => `
+    <figure class="video">
+      <div class="moldura">
+        <video controls preload="metadata" playsinline>
+          <source src="${v.src}">
+          Seu navegador não suporta o player de vídeo.
+        </video>
+      </div>
+      <figcaption>${v.titulo || ''}</figcaption>
+    </figure>
+  `).join('');
+}
+
+montarVideos();
 </script>
 
 </body>
