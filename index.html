@@ -72,10 +72,30 @@ header{
 }
 .titulo::after{
   content:"_";
-  animation:cursor 1s steps(1) infinite;
+  .titulo::after{
+  content:"_";
+  /* O cursor pisca o código Morse de "IG": I = ·· , G = ‒‒· */
+  animation:morse-ig 4.4s steps(1) infinite;
 }
-@keyframes cursor{ 50%{ opacity:0; } }
-@media (prefers-reduced-motion: reduce){
+@keyframes morse-ig{
+  /* I — ponto */
+  0%     { opacity:1; }
+  4.55%  { opacity:0; }
+  /* I — ponto */
+  9.09%  { opacity:1; }
+  13.64% { opacity:0; }  /* pausa entre letras */
+  /* G — traço */
+  27.27% { opacity:1; }
+  40.91% { opacity:0; }
+  /* G — traço */
+  45.45% { opacity:1; }
+  59.09% { opacity:0; }
+  /* G — ponto */
+  63.64% { opacity:1; }
+  68.18% { opacity:0; }  /* pausa longa antes de repetir */
+  100%   { opacity:0; }
+}
+   @media (prefers-reduced-motion: reduce){
   .titulo::after{ animation:none; }
 }
 .subtitulo{
